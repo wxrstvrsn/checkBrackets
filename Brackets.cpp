@@ -1,45 +1,48 @@
 #include <iostream>
-#include <queue>
+#include <stack>
 #include <string>
 
-
 unsigned findMismatchedBracket(const std::string &input) {
-    std::queue<unsigned> c1;
-    std::queue<unsigned> c2;
-    std::queue<unsigned> c3;
+    std::stack<unsigned> openParenStack;
+    std::stack<unsigned> openBracketStack;
+    std::stack<unsigned> openBraceStack;
     unsigned ret = 0;
+
     for (unsigned i = 0; i < input.length(); i++) {
-        if (input[i] == '[') c1.push(i + 1);
-        if (input[i] == '(') c2.push(i + 1);
-        if (input[i] == '{') c3.push(i + 1);
-
-
-        if (input[i] == '}') {
-            if (c3.empty()) {
+        if (input[i] == '(') {
+            openParenStack.push(i + 1);
+        } else if (input[i] == ')') {
+            if (openParenStack.empty()) {
                 return i + 1;
+            } else {
+                openParenStack.pop();
             }
-            else c3.pop();
-        }
-        if (input[i] == ']') {
-            if (c1.empty())
+        } else if (input[i] == '[') {
+            openBracketStack.push(i + 1);
+        } else if (input[i] == ']') {
+            if (openBracketStack.empty()) {
                 return i + 1;
-            else c1.pop();
-        }
-        if (input[i] == ')') {
-            if (c2.empty())
+            } else {
+                openBracketStack.pop();
+            }
+        } else if (input[i] == '{') {
+            openBraceStack.push(i + 1);
+        } else if (input[i] == '}') {
+            if (openBraceStack.empty()) {
                 return i + 1;
-            else c2.pop();
+            } else {
+                openBraceStack.pop();
+            }
         }
     }
 
-    if (!c1.empty())
-        ret = c1.front();
-
-    if (!c2.empty())
-        ret = ret == 0 ? c2.front() : ret < c2.front() ? ret : c2.front();
-
-    if (!c3.empty())
-        ret = ret == 0 ? c3.front() : ret < c3.front() ? ret : c3.front();
+    if (!openParenStack.empty()) {
+        return openParenStack.top();
+    } else if (!openBracketStack.empty()) {
+        return openBracketStack.top();
+    } else if (!openBraceStack.empty()) {
+        return openBraceStack.top();
+    }
 
     return ret;
 }
